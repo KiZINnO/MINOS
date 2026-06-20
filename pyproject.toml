@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "minos"
+version = "0.1.0"
+description = "Auto-Triage SOC Bot — Extract IoCs from security logs and score them with threat intelligence"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "aiohttp>=3.9.0",
+    "click>=8.1.0",
+    "python-dotenv>=1.0.0",
+    "python-evtx>=0.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[project.scripts]
+minos = "minos.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["minos*"]
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]

