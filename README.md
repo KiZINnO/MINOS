@@ -185,6 +185,3 @@ MINOS/
 
 MIT
 
----
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
