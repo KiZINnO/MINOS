@@ -100,17 +100,3 @@ SOC analysts waste **hours** manually triaging security logs.
 - **Web dashboard** — Lightweight Flask/FastAPI UI for non-CLI users
 - **MITRE ATT&CK mapping** — Tag IoCs with technique IDs automatically
 
----
-
-<!-- _class: lead -->
-
-# Thank You
-
-**MINOS** — Auto-Triage SOC Bot
-
-`git clone git@github.com:KiZINnO/MINOS.git`
-
-```bash
-pip install -e .
-minos sample_logs/sysmon_1.txt --no-intel
-```
