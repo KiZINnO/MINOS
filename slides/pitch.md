@@ -2,6 +2,7 @@
 marp: true
 theme: default
 paginate: true
+auto-advance: 20
 ---
 
 <!-- _class: lead -->
