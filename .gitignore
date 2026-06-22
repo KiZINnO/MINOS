@@ -35,8 +35,13 @@ Thumbs.db
 htmlcov/
 
 # Claude Code local state
-.claude/
 skills-lock.json
 
 # Dev progress notes
 PROGRESS.md
+
+# Templates
+_TEMPLATE.md
+
+# Report
+report.md
