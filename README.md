@@ -94,6 +94,57 @@ minos sample_logs/crowdsec_alert.json --no-intel
 minos sample_logs/sysmon_1.txt
 ```
 
+## Web UI
+
+MINOS includes a browser-based interface for interactive analysis with a multi-page layout.
+
+### Setup
+
+```bash
+cd web
+npm install
+```
+
+### Development
+
+Start the Vite dev server (frontend at `:5173`, proxying API calls to `:8000`):
+
+```bash
+# Terminal 1 — backend proxy
+cd .. && source .venv/bin/activate && uvicorn api.index:app --port 8000
+
+# Terminal 2 — frontend
+cd web && npm run dev
+```
+
+Open `http://localhost:5173` in your browser.
+
+### Build
+
+```bash
+npm run build    # outputs to web/dist/
+npm run preview  # preview the production build locally
+```
+
+### Deploy to Vercel
+
+1. Push your repo to GitHub
+2. Import the repository in the [Vercel dashboard](https://vercel.com)
+3. Framework preset: **Vite**
+4. Root directory: `web`
+5. Build command: `npm run build`
+6. Output directory: `dist`
+
+The FastAPI backend (`api/index.py`) deploys as a Vercel serverless function. Set your API keys as Vercel environment variables.
+
+### Pages
+
+| Page | Description |
+|------|-------------|
+| **Home** | Overview with getting-started guide and supported log formats |
+| **Analyze** | Main tool — paste logs, extract IoCs, query threat intel, view scored results |
+| **About** | Scoring logic, architecture, and documentation |
+
 ## Sample Output
 
 ### Markdown
@@ -176,6 +227,17 @@ MINOS/
 │   └── models.py            # Dataclasses & enums
 ├── tests/                   # pytest test suite (77 tests)
 ├── sample_logs/             # Example logs for testing
+├── api/                     # FastAPI CORS proxy (Vercel serverless)
+│   ├── index.py
+│   └── requirements.txt
+├── web/                     # Web UI (React + TypeScript + Vite)
+│   ├── src/
+│   │   ├── pages/           # Home, Analyze, About
+│   │   ├── components/      # Navbar, Footer, LogInput, IoCTable, etc.
+│   │   └── lib/             # Extractor, scorer, API client
+│   └── package.json
+├── slides/                  # Marp presentation
+├── vercel.json              # Vercel deployment config
 ├── pyproject.toml
 ├── requirements.txt
 └── .env.example
