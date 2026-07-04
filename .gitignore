@@ -4,9 +4,11 @@ __pycache__/
 *$py.class
 *.egg-info/
 *.egg
-dist/
 build/
 *.whl
+
+# Python dist (not web dist)
+minos/dist/
 
 # Virtual environments
 .venv/
