@@ -7,6 +7,17 @@ interface Props {
   loading: boolean;
 }
 
+const SAMPLE_LOG = `Sysmon Event ID 1 - Process Creation
+UtcTime: 2024-06-15 14:30:22.123
+Image: C:\\Windows\\System32\\cmd.exe
+CommandLine: cmd.exe /c powershell -enc SQBF...
+User: CORP\\jsmith
+Hashes: MD5=8a5b4c9d2e1f3a7b6c0d8e4f2a1b3c5d
+NetworkConnection:
+  SourceIp: 192.168.1.45
+  DestinationIp: 203.0.113.42
+  DestinationHostname: malicious-c2.evil.com`;
+
 export default function LogInput({ value, onChange, onAnalyze, loading }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -20,28 +31,25 @@ export default function LogInput({ value, onChange, onAnalyze, loading }: Props)
   };
 
   return (
-    <div style={{ marginBottom: "1rem" }}>
+    <div className="log-input-section">
+      <p className="log-input-hint">
+        Paste any security log below &mdash; Sysmon events, CrowdSec alerts, Splunk exports,
+        or raw text containing IPs, domains, or file hashes. MINOS will extract
+        Indicators of Compromise and optionally score them against threat intelligence sources.
+      </p>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Paste a security log here (Sysmon, CrowdSec, Splunk export, raw text)..."
+        placeholder="Paste a Sysmon event, CrowdSec alert, Splunk export, or any text with IPs like 192.168.1.1 and domains like evil.com..."
         rows={10}
-        style={{
-          width: "100%",
-          padding: "8px",
-          fontFamily: "monospace",
-          fontSize: "0.85rem",
-          boxSizing: "border-box",
-          resize: "vertical",
-        }}
+        className="log-textarea"
       />
-      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "0.5rem" }}>
+      <div className="log-input-actions">
         <button
           onClick={onAnalyze}
           disabled={loading || !value.trim()}
+          className="btn btn-primary"
           style={{
-            padding: "8px 20px",
-            fontWeight: 600,
             cursor: loading ? "not-allowed" : "pointer",
             opacity: loading || !value.trim() ? 0.5 : 1,
           }}
@@ -51,6 +59,13 @@ export default function LogInput({ value, onChange, onAnalyze, loading }: Props)
         <button onClick={() => fileRef.current?.click()} type="button">
           Upload file
         </button>
+        <button
+          type="button"
+          className="btn-link"
+          onClick={() => onChange(SAMPLE_LOG)}
+        >
+          Try a sample
+        </button>
         <input
           ref={fileRef}
           type="file"
@@ -58,7 +73,7 @@ export default function LogInput({ value, onChange, onAnalyze, loading }: Props)
           onChange={handleFile}
           style={{ display: "none" }}
         />
-        <span style={{ fontSize: "0.8rem", color: "#888" }}>
+        <span className="char-count">
           {value.length.toLocaleString()} chars
         </span>
       </div>

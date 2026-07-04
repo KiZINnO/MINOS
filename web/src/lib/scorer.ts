@@ -2,7 +2,7 @@
  * Risk Scoring Engine — TypeScript port of minos/scorer.py
  */
 
-import { IoC, IoCType, RiskLevel, ThreatIntelResult } from "../types";
+import { IoC, RiskLevel, ThreatIntelResult } from "../types";
 
 // ---------------------------------------------------------------------------
 // Per-source scoring thresholds

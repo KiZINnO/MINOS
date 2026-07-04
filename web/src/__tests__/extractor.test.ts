@@ -6,8 +6,8 @@ describe("IPv4 extraction", () => {
   it("extracts a single IPv4", () => {
     const iocs = extractIoCs("Connection from 192.168.1.1 established.");
     expect(iocs).toHaveLength(1);
-    expect(iocs[0].type).toBe(IoCType.IPV4);
-    expect(iocs[0].value).toBe("192.168.1.1");
+    expect(iocs[0]?.type).toBe(IoCType.IPV4);
+    expect(iocs[0]?.value).toBe("192.168.1.1");
   });
 
   it("extracts multiple IPv4 addresses", () => {
@@ -76,7 +76,7 @@ describe("Hash extraction", () => {
     const iocs = extractIoCs("File hash: d41d8cd98f00b204e9800998ecf8427e");
     const md5s = iocs.filter((i) => i.type === IoCType.MD5);
     expect(md5s).toHaveLength(1);
-    expect(md5s[0].value).toBe("d41d8cd98f00b204e9800998ecf8427e");
+    expect(md5s[0]?.value).toBe("d41d8cd98f00b204e9800998ecf8427e");
   });
 
   it("extracts SHA256", () => {

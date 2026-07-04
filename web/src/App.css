@@ -5,6 +5,7 @@
   --muted: #64748b;
   --border: #e2e8f0;
   --accent: #3b82f6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,33 +17,334 @@ body {
   line-height: 1.5;
 }
 
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------------ */
+/* Layout                                                              */
+/* ------------------------------------------------------------------ */
+
 .app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
   max-width: 960px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
 
-header h1 {
+/* ------------------------------------------------------------------ */
+/* Navbar                                                              */
+/* ------------------------------------------------------------------ */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.navbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+}
+
+.navbar-brand {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.navbar-brand:hover { text-decoration: none; }
+
+.nav-links {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.nav-link {
+  padding: 0.35rem 0.85rem;
+  border-radius: 6px;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.nav-link:hover { background: #f1f5f9; text-decoration: none; }
+.nav-link.active { background: #eff6ff; color: var(--accent); }
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+
+.btn {
+  display: inline-block;
+  padding: 8px 20px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.15s;
+}
+
+.btn:hover { background: #f1f5f9; text-decoration: none; }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.btn-primary:hover { background: #2563eb; }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+.btn-link:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------------ */
+/* Home page                                                           */
+/* ------------------------------------------------------------------ */
+
+.hero {
+  text-align: center;
+  padding: 3rem 0 2rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--muted);
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.section {
+  margin-top: 3rem;
+}
+
+.section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.step-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.step-card p {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.formats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.format-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.format-card h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.format-card p {
+  font-size: 0.83rem;
+  color: var(--muted);
+}
+
+.code-block {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ */
+/* Analyze page                                                        */
+/* ------------------------------------------------------------------ */
+
+.page-title {
   font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.page-desc {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* LogInput                                                            */
+/* ------------------------------------------------------------------ */
+
+.log-input-section {
   margin-bottom: 1.5rem;
 }
 
-header h1 small {
-  font-weight: 400;
-  color: var(--muted);
+.log-input-hint {
   font-size: 0.85rem;
-  margin-left: 0.5rem;
-}
-
-footer {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.8rem;
   color: var(--muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
 }
 
-footer a { color: var(--accent); text-decoration: none; }
+.log-textarea {
+  width: 100%;
+  padding: 8px;
+  font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.log-input-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.char-count {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* Tables                                                              */
+/* ------------------------------------------------------------------ */
+
+.table-section {
+  margin-bottom: 1.5rem;
+}
+
+.table-title {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+th {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.ioc-type { font-weight: 600; }
+.ioc-value { font-family: monospace; word-break: break-all; }
+
+/* ------------------------------------------------------------------ */
+/* Risk badge                                                          */
+/* ------------------------------------------------------------------ */
 
 .overall-risk {
   display: flex;
@@ -50,6 +352,10 @@ footer a { color: var(--accent); text-decoration: none; }
   font-weight: 600;
   margin-bottom: 1rem;
 }
+
+/* ------------------------------------------------------------------ */
+/* Status / error                                                      */
+/* ------------------------------------------------------------------ */
 
 .status-banner {
   padding: 0.75rem 1rem;
@@ -69,27 +375,14 @@ footer a { color: var(--accent); text-decoration: none; }
   font-size: 0.9rem;
 }
 
+/* ------------------------------------------------------------------ */
+/* Details / form                                                      */
+/* ------------------------------------------------------------------ */
+
 details summary {
   padding: 0.5rem 0;
-}
-
-table {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-button {
-  padding: 6px 16px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
   cursor: pointer;
-  font-size: 0.85rem;
-}
-
-button:hover {
-  background: #f1f5f9;
+  font-weight: 600;
 }
 
 input[type="text"],
@@ -99,8 +392,136 @@ input[type="password"] {
   background: var(--surface);
 }
 
-textarea {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
+/* ------------------------------------------------------------------ */
+/* About page                                                          */
+/* ------------------------------------------------------------------ */
+
+.about-section {
+  margin-bottom: 2rem;
+}
+
+.about-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.about-section h3 {
+  font-size: 1.05rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.about-section p {
+  margin-bottom: 0.75rem;
+}
+
+.about-section ul {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.about-section li {
+  margin-bottom: 0.4rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Footer                                                              */
+/* ------------------------------------------------------------------ */
+
+footer {
+  text-align: center;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 2rem;
+}
+
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------------ */
+/* Responsive — tablet                                                 */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .navbar-inner {
+    padding: 0.5rem 1rem;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive — phone                                                  */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 1rem 0.75rem;
+  }
+
+  .hero {
+    padding: 2rem 0 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+
+  .hero-sub {
+    font-size: 0.95rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .sources-col {
+    display: none;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  .log-input-actions {
+    gap: 0.5rem;
+  }
+
+  .code-block {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+  }
 }

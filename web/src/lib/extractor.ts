@@ -76,7 +76,7 @@ export function extractIoCs(text: string, deduplicate = true): IoC[] {
   // SHA256 (extract BEFORE MD5 to avoid substring matches)
   const sha256Values = new Set<string>();
   for (const match of text.matchAll(SHA256_PATTERN)) {
-    sha256Values.add(match[1].toLowerCase());
+    if (match[1]) sha256Values.add(match[1].toLowerCase());
   }
   for (const v of sha256Values) {
     iocs.push({ type: IoCType.SHA256, value: v, riskLevel: "none" as never, sources: [] });
@@ -85,8 +85,8 @@ export function extractIoCs(text: string, deduplicate = true): IoC[] {
   // MD5 (exclude strings already captured as SHA256)
   const md5Values = new Set<string>();
   for (const match of text.matchAll(MD5_PATTERN)) {
-    const v = match[1].toLowerCase();
-    if (!sha256Values.has(v)) {
+    const v = match[1]?.toLowerCase() ?? "";
+    if (v && !sha256Values.has(v)) {
       md5Values.add(v);
     }
   }
