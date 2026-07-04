@@ -117,20 +117,69 @@ export default function About() {
       </section>
 
       <section className="about-section">
-        <h2>API Services</h2>
-        <p>MINOS queries these threat intelligence services for IoC reputation data:</p>
-        <ul>
-          <li>
-            <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noreferrer">
-              VirusTotal
-            </a> — multi-engine malware scanning (IPs, domains, hashes)
-          </li>
-          <li>
-            <a href="https://www.abuseipdb.com/register" target="_blank" rel="noreferrer">
-              AbuseIPDB
-            </a> — IP address abuse reporting and reputation
-          </li>
-        </ul>
+        <h2>Getting API Keys</h2>
+        <p>
+          MINOS needs at least one API key to query threat intelligence.
+          You can use just one service, or both for broader coverage.
+        </p>
+
+        <h3>VirusTotal (free)</h3>
+        <ol>
+          <li>Go to <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noreferrer">virustotal.com/gui/join-us</a> and create a free account</li>
+          <li>After verifying your email, go to <strong>My API Key</strong> in your profile settings</li>
+          <li>Copy your API key</li>
+          <li>In MINOS, expand <strong>API Key Settings</strong> on the Analyze page and paste it into the VirusTotal field</li>
+        </ol>
+
+        <h3>AbuseIPDB (free)</h3>
+        <ol>
+          <li>Go to <a href="https://www.abuseipdb.com/register" target="_blank" rel="noreferrer">abuseipdb.com/register</a> and create a free account</li>
+          <li>After verifying your email, go to <strong>API Key</strong> in your account settings</li>
+          <li>Copy your API key</li>
+          <li>In MINOS, expand <strong>API Key Settings</strong> on the Analyze page and paste it into the AbuseIPDB field</li>
+        </ol>
+
+        <p className="note">
+          Your keys are stored in your browser's localStorage and sent directly
+          to the MINOS proxy — they are never stored on any external server.
+        </p>
+      </section>
+
+      <section className="about-section">
+        <h2>Rate Limits</h2>
+        <p>
+          Both VirusTotal and AbuseIPDB enforce rate limits on their free tiers.
+          MINOS automatically staggers requests to stay within these limits.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Free Tier Limit</th>
+              <th>MINOS Behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>VirusTotal</td>
+              <td>4 requests/minute</td>
+              <td>Queries one IoC at a time with ~16s delay between requests</td>
+            </tr>
+            <tr>
+              <td>AbuseIPDB</td>
+              <td>1,000 requests/day</td>
+              <td>Queries one IP at a time with 2s delay between requests</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p className="note">
+          <strong>Tip:</strong> If you have many IoCs, the analysis will take longer
+          due to rate limit delays. For example, 5 IPs against VirusTotal will take
+          about 80 seconds (5 x 16s). This is normal — it prevents your API key
+          from being throttled or banned.
+        </p>
       </section>
 
       <section className="about-section">

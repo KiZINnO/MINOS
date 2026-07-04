@@ -375,6 +375,38 @@ td {
   font-size: 0.9rem;
 }
 
+.info-banner {
+  padding: 0.75rem 1rem;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.info-banner strong { color: #15803d; }
+.info-banner a { color: #15803d; font-weight: 500; }
+
+.rate-hint {
+  display: block;
+  font-size: 0.82rem;
+  color: #1e40af;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.about-section .note {
+  background: #f8fafc;
+  border-left: 3px solid var(--accent);
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-radius: 0 6px 6px 0;
+}
+
 /* ------------------------------------------------------------------ */
 /* Details / form                                                      */
 /* ------------------------------------------------------------------ */

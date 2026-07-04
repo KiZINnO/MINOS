@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ApiKeys, IoC, RiskLevel, ThreatIntelResult } from "../types";
 import { extractIoCs } from "../lib/extractor";
 import { scoreReport } from "../lib/scorer";
-import { queryAll } from "../lib/api";
+import { queryAll, QueryProgress } from "../lib/api";
 import ApiKeySettings from "../components/ApiKeySettings";
 import LogInput from "../components/LogInput";
 import IoCTable from "../components/IoCTable";
@@ -26,6 +27,7 @@ export default function Analyze() {
   const [overallRisk, setOverallRisk] = useState<RiskLevel>(RiskLevel.NONE);
   const [status, setStatus] = useState<"idle" | "extracting" | "querying" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [queryProgress, setQueryProgress] = useState<QueryProgress | null>(null);
 
   useEffect(() => { setKeys(loadKeys()); }, []);
 
@@ -34,6 +36,7 @@ export default function Analyze() {
     setResults([]);
     setIocs([]);
     setOverallRisk(RiskLevel.NONE);
+    setQueryProgress(null);
 
     setStatus("extracting");
     const extracted = extractIoCs(logText);
@@ -53,7 +56,7 @@ export default function Analyze() {
 
     setStatus("querying");
     try {
-      const intelResults = await queryAll(extracted, keys.vt, keys.abuseipdb);
+      const intelResults = await queryAll(extracted, keys.vt, keys.abuseipdb, setQueryProgress);
       const { iocs: scored, overallRisk: risk } = scoreReport(extracted, intelResults);
       setIocs(scored);
       setResults(intelResults);
@@ -63,7 +66,10 @@ export default function Analyze() {
     }
 
     setStatus("done");
+    setQueryProgress(null);
   };
+
+  const hasKeys = keys.vt || keys.abuseipdb;
 
   return (
     <div className="analyze-page">
@@ -72,6 +78,18 @@ export default function Analyze() {
         Paste a security log below to extract Indicators of Compromise and
         query them against threat intelligence sources.
       </p>
+
+      {!hasKeys && (
+        <div className="info-banner">
+          <strong>No API keys yet?</strong> You need at least one API key to query threat intelligence.
+          Get a free key from{" "}
+          <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noreferrer">VirusTotal</a>
+          {" "}or{" "}
+          <a href="https://www.abuseipdb.com/register" target="_blank" rel="noreferrer">AbuseIPDB</a>,
+          then add it in the settings below. See the{" "}
+          <Link to="/about">About page</Link>{" "}for step-by-step instructions.
+        </div>
+      )}
 
       <ApiKeySettings keys={keys} onChange={setKeys} />
 
@@ -82,8 +100,19 @@ export default function Analyze() {
         loading={status === "extracting" || status === "querying"}
       />
 
-      {status === "querying" && (
-        <div className="status-banner">Querying threat intelligence sources...</div>
+      {status === "querying" && queryProgress && (
+        <div className="status-banner">
+          Querying threat intelligence...
+          {queryProgress.vtTotal > 0 && (
+            <span> VirusTotal: {queryProgress.vtDone}/{queryProgress.vtTotal}</span>
+          )}
+          {queryProgress.abuseTotal > 0 && (
+            <span> | AbuseIPDB: {queryProgress.abuseDone}/{queryProgress.abuseTotal}</span>
+          )}
+          {queryProgress.vtTotal > 1 && (
+            <span className="rate-hint"> (waiting between requests to respect rate limits)</span>
+          )}
+        </div>
       )}
 
       {error && (

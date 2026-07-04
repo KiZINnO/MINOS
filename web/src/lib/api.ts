@@ -1,13 +1,13 @@
 /**
  * API Client — proxy calls to FastAPI backend for VT & AbuseIPDB.
- * Includes client-side throttling (5s between analyses).
+ * Staggers requests with per-service delays to stay within rate limits.
  */
 
 import axios, { AxiosError } from "axios";
 import { IoC, IoCType, ThreatIntelResult } from "../types";
 
 // ---------------------------------------------------------------------------
-// Throttle
+// Throttle — prevent back-to-back analyses
 // ---------------------------------------------------------------------------
 
 const THROTTLE_MS = 5000;
@@ -20,8 +20,32 @@ function throttle(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Sequential query helper — stagger requests with a delay between each
+// ---------------------------------------------------------------------------
+
+async function querySequentially<T>(
+  items: T[],
+  delayMs: number,
+  fn: (item: T) => Promise<ThreatIntelResult>,
+  onProgress?: (done: number, total: number) => void,
+): Promise<ThreatIntelResult[]> {
+  const results: ThreatIntelResult[] = [];
+  for (let i = 0; i < items.length; i++) {
+    if (i > 0) {
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+    results.push(await fn(items[i]!));
+    onProgress?.(i + 1, items.length);
+  }
+  return results;
+}
+
+// ---------------------------------------------------------------------------
 // VirusTotal
 // ---------------------------------------------------------------------------
+
+// VT free tier: 4 requests/min → ~16s between requests to be safe
+const VT_DELAY_MS = 16_000;
 
 function vtPathFor(ioc: IoC): string {
   if (ioc.type === IoCType.IPV4) return `ip_addresses/${ioc.value}`;
@@ -45,12 +69,13 @@ function parseVtStats(data: Record<string, unknown>): {
 async function queryVT(
   iocs: IoC[],
   apiKey: string,
+  onProgress?: (done: number, total: number) => void,
 ): Promise<ThreatIntelResult[]> {
   const vtIocs = iocs.filter((i) =>
     [IoCType.IPV4, IoCType.DOMAIN, IoCType.MD5, IoCType.SHA256].includes(i.type),
   );
 
-  const tasks = vtIocs.map(async (ioc): Promise<ThreatIntelResult> => {
+  return querySequentially(vtIocs, VT_DELAY_MS, async (ioc) => {
     try {
       const resp = await axios.post(
         "/api/virustotal",
@@ -81,23 +106,25 @@ async function queryVT(
         error: msg,
       };
     }
-  });
-
-  return Promise.all(tasks);
+  }, onProgress);
 }
 
 // ---------------------------------------------------------------------------
 // AbuseIPDB
 // ---------------------------------------------------------------------------
 
+// AbuseIPDB free tier: ~1000/day, ~60/min → 2s between requests is safe
+const ABUSE_DELAY_MS = 2_000;
+
 async function queryAbuse(
   iocs: IoC[],
   apiKey: string,
+  onProgress?: (done: number, total: number) => void,
 ): Promise<ThreatIntelResult[]> {
   const ipIocs = iocs.filter((i) => i.type === IoCType.IPV4);
   if (ipIocs.length === 0) return [];
 
-  const tasks = ipIocs.map(async (ioc): Promise<ThreatIntelResult> => {
+  return querySequentially(ipIocs, ABUSE_DELAY_MS, async (ioc) => {
     try {
       const resp = await axios.post(
         "/api/abuseipdb",
@@ -128,28 +155,62 @@ async function queryAbuse(
         error: msg,
       };
     }
-  });
-
-  return Promise.all(tasks);
+  }, onProgress);
 }
 
 // ---------------------------------------------------------------------------
-// Unified query
+// Unified query — run VT and AbuseIPDB in parallel (they're independent),
+// but each service queries its IoCs sequentially with delays.
 // ---------------------------------------------------------------------------
+
+export interface QueryProgress {
+  vtDone: number;
+  vtTotal: number;
+  abuseDone: number;
+  abuseTotal: number;
+}
 
 export async function queryAll(
   iocs: IoC[],
   vtKey: string,
   abuseKey: string,
+  onProgress?: (progress: QueryProgress) => void,
 ): Promise<ThreatIntelResult[]> {
   await throttle();
   lastAnalysisTime = Date.now();
 
-  const tasks: Promise<ThreatIntelResult[]>[] = [];
-  if (vtKey) tasks.push(queryVT(iocs, vtKey));
-  if (abuseKey) tasks.push(queryAbuse(iocs, abuseKey));
-  if (tasks.length === 0) return [];
+  const vtIocs = vtKey
+    ? iocs.filter((i) => [IoCType.IPV4, IoCType.DOMAIN, IoCType.MD5, IoCType.SHA256].includes(i.type))
+    : [];
+  const abuseIocs = abuseKey
+    ? iocs.filter((i) => i.type === IoCType.IPV4)
+    : [];
 
-  const results = await Promise.all(tasks);
-  return results.flat();
+  const progress: QueryProgress = {
+    vtDone: 0,
+    vtTotal: vtIocs.length,
+    abuseDone: 0,
+    abuseTotal: abuseIocs.length,
+  };
+
+  const update = () => onProgress?.({ ...progress });
+
+  const vtTask = vtKey
+    ? queryVT(iocs, vtKey, (done, total) => {
+        progress.vtDone = done;
+        progress.vtTotal = total;
+        update();
+      })
+    : Promise.resolve([]);
+
+  const abuseTask = abuseKey
+    ? queryAbuse(iocs, abuseKey, (done, total) => {
+        progress.abuseDone = done;
+        progress.abuseTotal = total;
+        update();
+      })
+    : Promise.resolve([]);
+
+  const [vtResults, abuseResults] = await Promise.all([vtTask, abuseTask]);
+  return [...vtResults, ...abuseResults];
 }
