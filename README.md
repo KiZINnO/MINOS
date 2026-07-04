@@ -245,5 +245,5 @@ MINOS/
 
 ## License
 
-MIT
+[MIT](LICENSE)
 
