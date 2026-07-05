@@ -3,8 +3,8 @@
     { "src": "api/index.py", "use": "@vercel/python" },
     { "src": "web/dist/**", "use": "@vercel/static" }
   ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.py" },
-    { "source": "/((?!assets/|.*\\..*).*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.py" },
+    { "src": "/(.*)", "dest": "/web/dist/$1" }
   ]
 }
