@@ -1,4 +1,7 @@
 {
+  "buildCommand": "echo 'Using pre-built files'",
+  "outputDirectory": "web/dist",
+  "installCommand": "echo 'No install needed'",
   "rewrites": [
     { "source": "/((?!assets/|.*\\..*).*)", "destination": "/index.html" }
   ]
