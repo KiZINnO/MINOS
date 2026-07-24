@@ -1,8 +1,14 @@
-# 🛡️ MINOS — Auto-Triage SOC Bot
+# MINOS — Auto-Triage SOC Bot
 
 **MINOS** extracts Indicators of Compromise (IoCs) from raw security logs, queries them against threat intelligence APIs, and produces a clean, scorable triage report — in Markdown or JSON.
 
 > Named after the mythological king who judged the dead. MINOS judges your logs.
+
+## Screenshots
+
+![Home Page](screenshots/desktop.png) | ![Analyze Page](screenshots/analyze.png) | ![About Page](screenshots/about.png)
+:---: | :---: | :---:
+Home | Analyze | About
 
 ## Architecture
 
@@ -29,7 +35,9 @@
 - **EVTX Support** — Structured parsing of Windows Event Log (.evtx) files with EventID-aware field extraction
 - **Async Threat Intel** — Concurrent lookups against VirusTotal and AbuseIPDB
 - **Risk Scoring** — Multi-source confidence-based scoring with aggregation
-- **Dual Output** — Beautiful Markdown reports or SIEM-ready JSON
+- **Dual Output** — Markdown reports or SIEM-ready JSON
+- **Web UI** — Browser-based interface with dark mode and responsive layout
+- **Security Hardened** — CSP headers, sessionStorage key storage, pinned dependencies, sanitized error responses
 - **Zero Boilerplate** — Pipe a log in, get a report out
 
 ## Quick Start
@@ -96,7 +104,7 @@ minos sample_logs/sysmon_1.txt
 
 ## Web UI
 
-MINOS includes a browser-based interface for interactive analysis with a multi-page layout.
+MINOS includes a browser-based interface for interactive analysis with a multi-page layout, dark mode support, and security-hardened API proxying.
 
 ### Setup
 
@@ -135,7 +143,9 @@ npm run preview  # preview the production build locally
 5. Build command: `npm run build`
 6. Output directory: `dist`
 
-The FastAPI backend (`api/index.py`) deploys as a Vercel serverless function. Set your API keys as Vercel environment variables.
+The FastAPI backend (`api/index.py`) deploys as a Vercel serverless function. Users bring their own VirusTotal/AbuseIPDB API keys (configured in the web UI).
+
+> **Note:** SPA routing requires `vercel.json` to use `routes` (not `rewrites`) for client-side URL fallback. The current config maps `/(.*)` to `/web/dist/$1` — if your /analyze or /about pages return 404 on refresh, this is the first thing to check.
 
 ### Pages
 
@@ -144,6 +154,17 @@ The FastAPI backend (`api/index.py`) deploys as a Vercel serverless function. Se
 | **Home** | Overview with getting-started guide and supported log formats |
 | **Analyze** | Main tool — paste logs, extract IoCs, query threat intel, view scored results |
 | **About** | Scoring logic, architecture, and documentation |
+
+### Dark Mode
+
+Click the moon/sun icon in the navbar to toggle between light and dark themes. The preference is persisted in localStorage and respects your system's `prefers-color-scheme` setting by default.
+
+### Security
+
+- **CSP headers** set on both the frontend HTML (`<meta>` tag) and all API responses (`SecurityHeadersMiddleware`)
+- **API keys** stored in `sessionStorage` (cleared on tab close) instead of `localStorage`
+- **Rate limiting** — per-IP sliding window (10 req/min) on the API, plus client-side throttle
+- **Error sanitization** — internal error details logged server-side, generic messages returned to client
 
 ## Sample Output
 
@@ -217,29 +238,37 @@ The FastAPI backend (`api/index.py`) deploys as a Vercel serverless function. Se
 
 ```
 MINOS/
-├── minos/                  # Core package
-│   ├── cli.py              # CLI entry point (click)
-│   ├── extractor.py         # IoC regex extraction
-│   ├── evtx_parser.py       # Windows EVTX structured parser
-│   ├── threat_intel.py      # Async API clients (VirusTotal, AbuseIPDB)
-│   ├── scorer.py            # Risk scoring engine
-│   ├── formatter.py         # Markdown & JSON output
-│   └── models.py            # Dataclasses & enums
-├── tests/                   # pytest test suite (77 tests)
-├── sample_logs/             # Example logs for testing
-├── api/                     # FastAPI CORS proxy (Vercel serverless)
-│   ├── index.py
-│   └── requirements.txt
-├── web/                     # Web UI (React + TypeScript + Vite)
+├── minos/                   # Core Python package
+│   ├── cli.py               # CLI entry point (click)
+│   ├── extractor.py          # IoC regex extraction
+│   ├── evtx_parser.py        # Windows EVTX structured parser
+│   ├── threat_intel.py       # Async API clients (VirusTotal, AbuseIPDB)
+│   ├── scorer.py             # Risk scoring engine
+│   ├── formatter.py          # Markdown & JSON output
+│   └── models.py             # Dataclasses & enums
+├── tests/                    # pytest test suite
+├── sample_logs/              # Example logs for testing
+├── api/
+│   └── index.py              # FastAPI CORS proxy (Vercel serverless)
+├── web/                      # Web UI (React + TypeScript + Vite)
 │   ├── src/
-│   │   ├── pages/           # Home, Analyze, About
-│   │   ├── components/      # Navbar, Footer, LogInput, IoCTable, etc.
-│   │   └── lib/             # Extractor, scorer, API client
-│   └── package.json
-├── slides/                  # Marp presentation
-├── vercel.json              # Vercel deployment config
+│   │   ├── pages/            # Home, Analyze, About
+│   │   ├── components/       # Navbar, Footer, LogInput, IoCTable, etc.
+│   │   ├── hooks/            # useTheme (dark mode hook)
+│   │   └── lib/              # Extractor, scorer, API client
+│   └── index.html            # CSP meta tag included
+├── feedback/                 # Feedback & open issues tracking
+│   └── issues.md
+├── screenshots/              # App screenshots for documentation
+├── slides/                   # Marp presentation
+├── .claude/
+│   └── agents/
+│       ├── code-reviewer.md
+│       ├── researcher.md
+│       └── security-reviewer.md
+├── vercel.json
 ├── pyproject.toml
-├── requirements.txt
+├── requirements.txt          # Pinned exact versions
 └── .env.example
 ```
 

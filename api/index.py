@@ -6,14 +6,18 @@ threat intel APIs without exposing keys server-side.
 Deployment: Vercel Serverless (Python)
 """
 
+import logging
 from collections import defaultdict
 from time import time
 
 import httpx
+
+logger = logging.getLogger(__name__)
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI(title="MINOS API", version="0.1.0")
 
@@ -28,6 +32,31 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------------------------------------------------------------------
+# Security headers — CSP, XSS protection, MIME sniffing
+# ---------------------------------------------------------------------------
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "connect-src 'self' https://www.virustotal.com https://api.abuseipdb.com; "
+            "script-src 'self'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data:; "
+            "font-src 'self'; "
+            "base-uri 'self'"
+        )
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 # ---------------------------------------------------------------------------
 # Rate limiting — per-IP sliding window
@@ -123,9 +152,11 @@ async def proxy_virustotal(
         try:
             resp = await client.get(url, headers=headers)
         except httpx.TimeoutException:
-            raise HTTPException(status_code=504, detail="Upstream timeout")
-        except httpx.RequestError:
-            raise HTTPException(status_code=502, detail="Upstream unreachable")
+            logger.warning("VT upstream timeout for path=%s", body.path)
+            raise HTTPException(status_code=504, detail="Upstream request timed out")
+        except httpx.RequestError as e:
+            logger.warning("VT upstream error: %s", e)
+            raise HTTPException(status_code=502, detail="Upstream request failed")
 
     data = resp.json()
     response = JSONResponse(content=data, status_code=resp.status_code)
@@ -163,9 +194,11 @@ async def proxy_abuseipdb(
         try:
             resp = await client.get(url, headers=headers, params=params)
         except httpx.TimeoutException:
-            raise HTTPException(status_code=504, detail="Upstream timeout")
-        except httpx.RequestError:
-            raise HTTPException(status_code=502, detail="Upstream unreachable")
+            logger.warning("AbuseIPDB upstream timeout for ip=%s", body.ip)
+            raise HTTPException(status_code=504, detail="Upstream request timed out")
+        except httpx.RequestError as e:
+            logger.warning("AbuseIPDB upstream error: %s", e)
+            raise HTTPException(status_code=502, detail="Upstream request failed")
 
     data = resp.json()
     response = JSONResponse(content=data, status_code=resp.status_code)

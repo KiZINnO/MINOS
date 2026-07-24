@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import useTheme from "../hooks/useTheme";
 
 const LINKS = [
   { to: "/", label: "Home" },
@@ -10,6 +11,7 @@ const LINKS = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const { theme, toggle } = useTheme();
 
   return (
     <nav className="navbar">
@@ -35,6 +37,14 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          <button
+            className="nav-link theme-toggle"
+            onClick={toggle}
+            aria-label="Toggle dark mode"
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
         </div>
       </div>
     </nav>

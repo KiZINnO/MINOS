@@ -81,8 +81,9 @@ async def _vt_lookup(
             )
     except asyncio.TimeoutError:
         return ThreatIntelResult(ioc=ioc, source="VirusTotal", error="Request timed out")
-    except Exception as e:
-        return ThreatIntelResult(ioc=ioc, source="VirusTotal", error=str(e))
+    except aiohttp.ClientError as e:
+        logger.warning("VT lookup failed for %s: %s", ioc.value, e)
+        return ThreatIntelResult(ioc=ioc, source="VirusTotal", error="Upstream request failed")
 
 
 async def query_virustotal(
@@ -153,8 +154,9 @@ async def _abuse_lookup_ip(
             )
     except asyncio.TimeoutError:
         return ThreatIntelResult(ioc=ioc, source="AbuseIPDB", error="Request timed out")
-    except Exception as e:
-        return ThreatIntelResult(ioc=ioc, source="AbuseIPDB", error=str(e))
+    except aiohttp.ClientError as e:
+        logger.warning("AbuseIPDB lookup failed for %s: %s", ip, e)
+        return ThreatIntelResult(ioc=ioc, source="AbuseIPDB", error="Upstream request failed")
 
 
 async def query_abuseipdb(

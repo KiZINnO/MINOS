@@ -33,3 +33,12 @@
 - [ ] Tighten CORS configuration (restrict origins, do not pass credentials with wildcard origins)
 - [ ] Add input validation to the API proxy to prevent SSRF attacks
 - [ ] Create a SECURITY.md file with vulnerability disclosure procedures
+
+## Assessment
+
+After reviewing the actual project threat model (BYO-key single-user tool), both CORS and SSRF concerns are **low priority**:
+
+- **CORS:** API keys are sent *to* the API as request headers, never returned. Users bring their own keys — no server credentials at risk.
+- **SSRF:** VT base URL is hardcoded; cannot reach internal services. Users proxy against their own quota.
+
+See `feedback/issues.md` for full breakdown.

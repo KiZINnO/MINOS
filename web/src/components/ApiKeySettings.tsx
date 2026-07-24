@@ -12,7 +12,7 @@ export default function ApiKeySettings({ keys, onChange }: Props) {
   const update = (field: keyof ApiKeys, value: string) => {
     const next = { ...keys, [field]: value };
     onChange(next);
-    localStorage.setItem("minos_api_keys", JSON.stringify(next));
+    sessionStorage.setItem("minos_api_keys", JSON.stringify(next));
   };
 
   return (

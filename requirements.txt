@@ -1,12 +1,12 @@
-aiohttp>=3.9.0
-click>=8.1.0
-python-dotenv>=1.0.0
-python-evtx>=0.8.0
+aiohttp==3.14.3
+click==8.4.2
+python-dotenv==1.2.2
+python-evtx==0.8.1
 
 # API (Vercel serverless proxy)
-fastapi>=0.104.0
-httpx>=0.25.0
+fastapi==0.139.2
+httpx==0.28.1
 
 # Dev / testing
-pytest>=8.0.0
-pytest-asyncio>=0.23.0
+pytest==9.1.1
+pytest-asyncio==1.4.0

@@ -13,7 +13,7 @@ import RiskBadge from "../components/RiskBadge";
 
 function loadKeys(): ApiKeys {
   try {
-    const raw = localStorage.getItem("minos_api_keys");
+    const raw = sessionStorage.getItem("minos_api_keys");
     if (raw) return JSON.parse(raw);
   } catch {}
   return { vt: "", abuseipdb: "" };
