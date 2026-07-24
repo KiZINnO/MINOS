@@ -6,9 +6,18 @@
 
 ## Screenshots
 
-![Home Page](screenshots/desktop.png) | ![Analyze Page](screenshots/analyze.png) | ![About Page](screenshots/about.png)
-:---: | :---: | :---:
-Home | Analyze | About
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/home-1280x800.png" height="320" alt="Home Page"></td>
+    <td align="center"><img src="screenshots/analyze-1280x800.png" height="320" alt="Analyze Page"></td>
+    <td align="center"><img src="screenshots/about-1280x800.png" height="320" alt="About Page"></td>
+  </tr>
+  <tr>
+    <td align="center">Home</td>
+    <td align="center">Analyze</td>
+    <td align="center">About</td>
+  </tr>
+</table>
 
 ## Architecture
 
